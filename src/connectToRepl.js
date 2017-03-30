@@ -16,7 +16,7 @@ export function connectToRepl(opts = {}){
 	socket.on("close", () => {
 	  process.stdin.setRawMode(false);
 	  process.stdin.pause();
-	  socket.removeListener("close", done);
+	  socket.removeListener("close");
 	});
 
 	process.stdin.on("end", () => {
