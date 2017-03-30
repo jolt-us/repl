@@ -1,5 +1,5 @@
 {
-  "name": "@joltus/jolt-repl",
+  "name": "@jolt-us/repl",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
