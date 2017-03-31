@@ -8,24 +8,21 @@ export function connectToRepl(opts = {}){
 	process.stdin.pipe(socket);
 	socket.pipe(process.stdout);
 
-	socket.on("connect", () => {
-	  process.stdin.resume();
-	  process.stdin.setRawMode(true);
-	});
-
-	socket.on("close", () => {
+	const handleClose = () => {
 	  process.stdin.setRawMode(false);
 	  process.stdin.pause();
-	  socket.removeListener("close");
-	});
+	  socket.removeListener("close", handleClose);
+	};
+
+	const handleConnect = () => {
+	  process.stdin.resume();
+	  process.stdin.setRawMode(true);
+	};
+
+	socket.on("connect", handleConnect);
+	socket.on("close", handleClose);
 
 	process.stdin.on("end", () => {
 	  socket.destroy();
-	});
-
-	process.stdin.on("data", (data) => {
-	  if (data.length === 1 && data[0] === 4) {
-	    process.stdin.emit("end");
-	  }
 	});
 }

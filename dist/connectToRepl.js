@@ -17,24 +17,22 @@ function connectToRepl() {
 	process.stdin.pipe(socket);
 	socket.pipe(process.stdout);
 
-	socket.on("connect", function () {
-		process.stdin.resume();
-		process.stdin.setRawMode(true);
-	});
-
-	socket.on("close", function () {
+	var handleClose = function handleClose() {
 		process.stdin.setRawMode(false);
 		process.stdin.pause();
-		socket.removeListener("close");
-	});
+		socket.removeListener("close", handleClose);
+		socket.removeListener("close", handleConnect);
+	};
+
+	var handleConnect = function handleConnect() {
+		process.stdin.resume();
+		process.stdin.setRawMode(true);
+	};
+
+	socket.on("connect", handleConnect);
+	socket.on("close", handleClose);
 
 	process.stdin.on("end", function () {
 		socket.destroy();
-	});
-
-	process.stdin.on("data", function (data) {
-		if (data.length === 1 && data[0] === 4) {
-			process.stdin.emit("end");
-		}
 	});
 }
